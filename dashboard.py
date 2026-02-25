@@ -48,6 +48,10 @@ if uploaded_file:
         "Rok", years, default=years
     )
 
+    st.sidebar.header("🎨 Styl linii")
+    line_width = st.sidebar.slider("Grubość linii", min_value=1, max_value=6, value=2)
+    line_style = st.sidebar.selectbox("Styl linii", ["per grupa", "solid", "dash", "dot", "dashdot"])
+
     date_range = st.sidebar.date_input(
         "Zakres dat",
         value=[df["dzien_zapisu"].min(), df["dzien_zapisu"].max()],
@@ -83,6 +87,7 @@ if uploaded_file:
     for col in selected_cols:
         year = col.split("_")[-1]
         group = get_group(col)
+        dash = group_dash.get(group, "solid") if line_style == "per grupa" else line_style
         fig.add_trace(go.Scatter(
             x=df["dzien_zapisu"],
             y=df[col],
@@ -90,8 +95,8 @@ if uploaded_file:
             mode="lines",
             line=dict(
                 color=year_colors.get(year, "#888"),
-                dash=group_dash.get(group, "solid"),
-                width=2,
+                dash=dash,
+                width=line_width,
             ),
         ))
 
